@@ -7,15 +7,15 @@ if [ -z "$clusterId" ]; then
   exit 
 fi
 
-if [ -z "$AWS_ACCESS_KEY_ID" ]; then
-  exit 80
-fi
-if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-  exit 80
-fi
-if [ -z "$AWS_DEFAULT_REGION" ]; then
-  exit 80
-fi
+# if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+#   exit 80
+# fi
+# if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+#   exit 80
+# fi
+# if [ -z "$AWS_DEFAULT_REGION" ]; then
+#   exit 80
+# fi
 
 
 echo "0 - Start processing for cluster $clusterId - waiting for masters to be destroyed"
