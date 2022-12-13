@@ -64,3 +64,10 @@ output "aws_lb_api_internal_zone_id" {
   value = aws_lb.api_internal.zone_id
 }
 
+output "aws_vpc_endpoint_private_ec2_dns_name" {
+  value = aws_vpc_endpoint.private_ec2.dns_entry[1]["dns_name"]
+}
+
+output "aws_vpc_endpoint_private_ec2_hosted_zone_id" {
+  value = aws_vpc_endpoint.private_ec2.dns_entry[1]["hosted_zone_id"]
+}

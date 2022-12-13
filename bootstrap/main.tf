@@ -5,7 +5,7 @@ locals {
 terraform {
   required_providers {
     ignition = {
-      source = "community-terraform-providers/ignition"
+      source  = "community-terraform-providers/ignition"
       version = "2.1.2"
     }
   }
@@ -16,8 +16,7 @@ data "aws_partition" "current" {}
 data "aws_ebs_default_kms_key" "current" {}
 
 resource "aws_s3_bucket" "ignition" {
-  # bucket = var.ignition_bucket
-  acl = "private"
+  bucket = var.ignition_bucket
 
   tags = merge(
     {
@@ -37,7 +36,7 @@ resource "aws_s3_bucket_object" "ignition" {
   content = var.ignition
   acl     = "private"
 
-  server_side_encryption = "AES256"
+  # server_side_encryption = "AES256"
 
   tags = merge(
     {
@@ -145,7 +144,7 @@ resource "aws_instance" "bootstrap" {
 
   tags = merge(
     {
-    "Name" = "${var.cluster_id}-bootstrap"
+      "Name" = "${var.cluster_id}-bootstrap"
     },
     var.tags,
   )
@@ -160,7 +159,7 @@ resource "aws_instance" "bootstrap" {
 
   volume_tags = merge(
     {
-    "Name" = "${var.cluster_id}-bootstrap-vol"
+      "Name" = "${var.cluster_id}-bootstrap-vol"
     },
     var.tags,
   )
@@ -184,7 +183,7 @@ resource "aws_security_group" "bootstrap" {
 
   tags = merge(
     {
-    "Name" = "${var.cluster_id}-bootstrap-sg"
+      "Name" = "${var.cluster_id}-bootstrap-sg"
     },
     var.tags,
   )

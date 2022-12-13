@@ -1,5 +1,5 @@
 resource "aws_lb" "api_internal" {
-  name                             = "${var.cluster_id}-int"
+  name                             = "${var.cluster_id}Int"
   load_balancer_type               = "network"
   subnets                          = data.aws_subnet.private.*.id
   internal                         = true
@@ -22,7 +22,7 @@ resource "aws_lb" "api_internal" {
 resource "aws_lb" "api_external" {
   count = local.public_endpoints ? 1 : 0
 
-  name                             = "${var.cluster_id}-ext"
+  name                             = "${var.cluster_id}Ext"
   load_balancer_type               = "network"
   subnets                          = data.aws_subnet.public.*.id
   internal                         = false
@@ -43,7 +43,7 @@ resource "aws_lb" "api_external" {
 }
 
 resource "aws_lb_target_group" "api_internal" {
-  name     = "${var.cluster_id}-aint"
+  name     = "${var.cluster_id}Aint"
   protocol = "TCP"
   port     = 6443
   vpc_id   = data.aws_vpc.cluster_vpc.id
@@ -70,7 +70,7 @@ resource "aws_lb_target_group" "api_internal" {
 resource "aws_lb_target_group" "api_external" {
   count = local.public_endpoints ? 1 : 0
 
-  name     = "${var.cluster_id}-aext"
+  name     = "${var.cluster_id}Aext"
   protocol = "TCP"
   port     = 6443
   vpc_id   = data.aws_vpc.cluster_vpc.id
@@ -95,7 +95,7 @@ resource "aws_lb_target_group" "api_external" {
 }
 
 resource "aws_lb_target_group" "services" {
-  name     = "${var.cluster_id}-sint"
+  name     = "${var.cluster_id}Sint"
   protocol = "TCP"
   port     = 22623
   vpc_id   = data.aws_vpc.cluster_vpc.id

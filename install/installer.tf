@@ -3,10 +3,10 @@ resource "null_resource" "openshift_installer" {
     command = <<EOF
 case $(uname -s) in
   Linux)
-    wget -r -l1 -np -nd ${var.openshift_installer_url} -q -P ${path.root}/installer-files/ -A 'openshift-install-linux-4*.tar.gz'
+    wget -r -l1 -np -nd ${var.openshift_installer_url}/openshift-install-linux.tar.gz -q -P ${path.root}/installer-files/ -A 'openshift-install-linux-4*.tar.gz'
     ;;
   Darwin)
-    wget -r -l1 -np -nd ${var.openshift_installer_url} -q -P ${path.root}/installer-files/ -A 'openshift-install-mac-4*.tar.gz'
+     cp openshift-install-mac-4.6.28.tar.gz ${path.root}/installer-files/
     ;;
   *) exit 1
     ;;
@@ -28,10 +28,10 @@ resource "null_resource" "openshift_client" {
     command = <<EOF
 case $(uname -s) in
   Linux)
-    wget -r -l1 -np -nd ${var.openshift_installer_url} -q -P ${path.root}/installer-files/ -A 'openshift-client-linux-4*.tar.gz'
+    wget -r -l1 -np -nd ${var.openshift_installer_url}/openshift-client-linux.tar.gz-q -P ${path.root}/installer-files/ -A 'openshift-client-linux-4*.tar.gz'
     ;;
   Darwin)
-    wget -r -l1 -np -nd ${var.openshift_installer_url} -q -P ${path.root}/installer-files/ -A 'openshift-client-mac-4*.tar.gz'
+    cp openshift-client-mac-4.6.28.tar.gz ${path.root}/installer-files/
     ;;
   *)
     exit 1
@@ -51,7 +51,7 @@ EOF
 
 resource "null_resource" "generate_manifests" {
   triggers = {
-    install_config =  data.template_file.install_config_yaml.rendered
+    install_config = data.template_file.install_config_yaml.rendered
   }
 
   depends_on = [
@@ -84,8 +84,8 @@ resource "null_resource" "manifest_cleanup_control_plane_machineset" {
   ]
 
   triggers = {
-    install_config =  data.template_file.install_config_yaml.rendered
-    local_file     =  local_file.install_config.id
+    install_config = data.template_file.install_config_yaml.rendered
+    local_file     = local_file.install_config.id
   }
 
   provisioner "local-exec" {
@@ -114,8 +114,8 @@ resource "null_resource" "generate_ignition_config" {
   ]
 
   triggers = {
-    install_config                   =  data.template_file.install_config_yaml.rendered
-    local_file_install_config        =  local_file.install_config.id
+    install_config            = data.template_file.install_config_yaml.rendered
+    local_file_install_config = local_file.install_config.id
   }
 
   provisioner "local-exec" {
@@ -123,19 +123,19 @@ resource "null_resource" "generate_ignition_config" {
   }
 
   provisioner "local-exec" {
-    command = "rm -rf ${path.root}/installer-files//temp/_manifests ${path.root}/installer-files//temp/_openshift"
+    command = "rm -rf ${path.root}/installer-files/temp/_manifests ${path.root}/installer-files/temp/_openshift"
   }
 
   provisioner "local-exec" {
-    command = "cp -r ${path.root}/installer-files//temp/manifests ${path.root}/installer-files//temp/_manifests"
+    command = "cp -r ${path.root}/installer-files/temp/manifests ${path.root}/installer-files/temp/_manifests"
   }
 
   provisioner "local-exec" {
-    command = "cp -r ${path.root}/installer-files//temp/openshift ${path.root}/installer-files//temp/_openshift"
+    command = "cp -r ${path.root}/installer-files/temp/openshift ${path.root}/installer-files/temp/_openshift"
   }
 
   provisioner "local-exec" {
-    command = "${path.root}/installer-files//openshift-install --dir=${path.root}/installer-files//temp create ignition-configs"
+    command = "${path.root}/installer-files/openshift-install --dir=${path.root}/installer-files/temp create ignition-configs"
   }
 }
 
@@ -183,7 +183,7 @@ data "local_file" "bootstrap_ign" {
     null_resource.generate_ignition_config
   ]
 
-  filename =  "${path.root}/installer-files//temp/bootstrap.ign"
+  filename = "${path.root}/installer-files//temp/bootstrap.ign"
 }
 
 data "local_file" "master_ign" {
@@ -191,7 +191,7 @@ data "local_file" "master_ign" {
     null_resource.generate_ignition_config
   ]
 
-  filename =  "${path.root}/installer-files//temp/master.ign"
+  filename = "${path.root}/installer-files//temp/master.ign"
 }
 
 data "local_file" "worker_ign" {
@@ -199,7 +199,7 @@ data "local_file" "worker_ign" {
     null_resource.generate_ignition_config
   ]
 
-  filename =  "${path.root}/installer-files//temp/worker.ign"
+  filename = "${path.root}/installer-files//temp/worker.ign"
 }
 
 resource "null_resource" "get_auth_config" {

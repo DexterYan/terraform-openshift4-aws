@@ -21,8 +21,8 @@ locals {
 }
 
 data "local_file" "cabundle" {
-  count = var.openshift_additional_trust_bundle == "" ? 0 : 1
-  filename = "${var.openshift_additional_trust_bundle}"
+  count    = var.openshift_additional_trust_bundle == "" ? 0 : 1
+  filename = var.openshift_additional_trust_bundle
 }
 
 
@@ -33,7 +33,7 @@ baseDomain: ${var.domain}
 compute:
 - hyperthreading: Enabled
   name: worker
-  replicas: 3
+  replicas: 1
   platform:
     aws:
       rootVolume:
@@ -42,8 +42,8 @@ compute:
         type: ${var.aws_worker_root_volume_type}
       type: ${var.aws_worker_instance_type}
       zones:
-      %{ for zone in var.aws_worker_availability_zones}
-      - ${zone}%{ endfor }
+      %{for zone in var.aws_worker_availability_zones}
+      - ${zone}%{endfor}
 controlPlane:
   hyperthreading: Enabled
   name: master
@@ -75,14 +75,14 @@ sshKey: '${local.public_ssh_key}'
   httpsProxy: ${var.proxy_config["httpsProxy"]}
   noProxy: ${var.proxy_config["noProxy"]}%{endif}
 %{if var.openshift_additional_trust_bundle != ""}additionalTrustBundle: | 
-  ${indent(2,data.local_file.cabundle[0].content)}%{endif}
+  ${indent(2, data.local_file.cabundle[0].content)}%{endif}
 EOF
 }
 
 
 resource "local_file" "install_config" {
-  content  =  data.template_file.install_config_yaml.rendered
-  filename =  "${path.root}/installer-files/install-config.yaml"
+  content  = data.template_file.install_config_yaml.rendered
+  filename = "${path.root}/installer-files/install-config.yaml"
 }
 
 # when the subnets are provided, modify the worker machinesets 
@@ -90,7 +90,7 @@ resource "null_resource" "manifest_cleanup_worker_machineset" {
   depends_on = [
     null_resource.generate_manifests
   ]
-  count  = var.aws_private_subnets != null ? length(var.aws_private_subnets) : 0
+  count = var.aws_private_subnets != null ? length(var.aws_private_subnets) : 0
   provisioner "local-exec" {
     command = "rm -f ${path.root}/installer-files/temp/openshift/99_openshift-cluster-api_worker-machineset-${count.index}.yaml"
   }
@@ -100,7 +100,7 @@ resource "local_file" "create_worker_machineset" {
   depends_on = [
     null_resource.manifest_cleanup_worker_machineset
   ]
-  count  = var.aws_private_subnets != null ? length(var.aws_private_subnets) : 0
+  count           = var.aws_private_subnets != null ? length(var.aws_private_subnets) : 0
   file_permission = "0644"
   filename        = "${path.root}/installer-files/temp/openshift/99_openshift-cluster-api_worker-machineset-${count.index}.yaml"
   content         = <<EOF
@@ -195,7 +195,7 @@ data "local_file" "infrastructureID" {
   depends_on = [
     null_resource.extractInfrastructureID
   ]
-  filename        =  "${path.root}/installer-files/infraID"
+  filename = "${path.root}/installer-files/infraID"
 
 }
 
@@ -205,7 +205,7 @@ resource "local_file" "airgapped_registry_upgrades" {
   depends_on = [
     null_resource.generate_manifests,
   ]
-  content  = <<EOF
+  content = <<EOF
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageContentSourcePolicy
 metadata:
@@ -235,7 +235,7 @@ EOF
 }
 
 resource "local_file" "cluster-dns-02-config" {
-  count = var.byo_dns ? 1 : 0
+  count    = var.byo_dns ? 1 : 0
   content  = data.template_file.cluster-dns-02-config.rendered
   filename = "${path.root}/installer-files/temp/manifests/cluster-dns-02-config.yml"
   depends_on = [
@@ -253,7 +253,7 @@ resource "local_file" "create_infra_machineset" {
     null_resource.generate_manifests
   ]
 
-  count  = var.infra_count > 0 ? length(var.aws_worker_availability_zones) : 0
+  count           = var.infra_count > 0 ? length(var.aws_worker_availability_zones) : 0
   file_permission = "0644"
   filename        = "${path.root}/installer-files/temp/openshift/99_openshift-cluster-api_infra-machineset-${count.index}.yaml"
   content         = <<EOF

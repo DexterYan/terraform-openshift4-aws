@@ -55,6 +55,15 @@ EOF
 }
 
 variable "region" {
-  type = string
+  type        = string
   description = "The target AWS region for the cluster."
+}
+
+variable "aws_vpc_endpoint_private_ec2_dns_name" {
+  type = string
+}
+
+
+variable "aws_vpc_endpoint_private_ec2_hosted_zone_id" {
+  type = string
 }

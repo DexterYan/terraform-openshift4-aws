@@ -102,32 +102,35 @@ EOF
 
 }
 
-resource "aws_network_interface" "master" {
-  count     = var.instance_count
-  subnet_id = var.az_to_subnet_id[var.availability_zones[count.index]]
-  
-  security_groups = var.master_sg_ids
-  
-  tags = merge(
-    {
-    "Name" = "${var.cluster_id}-master-${count.index}"
-    },
-    var.tags,
-  )
-}
-  
+# resource "aws_network_interface" "master" {
+#   count     = var.instance_count
+#   subnet_id = var.az_to_subnet_id[var.availability_zones[count.index]]
+
+#   security_groups = var.master_sg_ids
+
+#   tags = merge(
+#     {
+#       "Name" = "${var.cluster_id}-master-${count.index}"
+#     },
+#     var.tags,
+#   )
+# }
+
 resource "aws_instance" "master" {
   count = var.instance_count
   ami   = var.ec2_ami
 
-  iam_instance_profile = aws_iam_instance_profile.master.name
-  instance_type        = var.instance_type
-  user_data            = var.user_data_ign
+  iam_instance_profile        = aws_iam_instance_profile.master.name
+  instance_type               = var.instance_type
+  user_data                   = var.user_data_ign
+  associate_public_ip_address = true
+  vpc_security_group_ids      = var.master_sg_ids
+  subnet_id                   = var.az_to_subnet_id[var.availability_zones[count.index]]
 
-  network_interface {
-    network_interface_id = aws_network_interface.master[count.index].id
-    device_index         = 0
-  }
+  # network_interface {
+  #   network_interface_id = aws_network_interface.master[count.index].id
+  #   device_index         = 0
+  # }
 
   lifecycle {
     # Ignore changes in the AMI which force recreation of the resource. This
@@ -138,7 +141,7 @@ resource "aws_instance" "master" {
 
   tags = merge(
     {
-    "Name" = "${var.cluster_id}-master-${count.index}"
+      "Name" = "${var.cluster_id}-master-${count.index}"
     },
     var.tags,
   )
@@ -153,7 +156,7 @@ resource "aws_instance" "master" {
 
   volume_tags = merge(
     {
-    "Name" = "${var.cluster_id}-master-${count.index}-vol"
+      "Name" = "${var.cluster_id}-master-${count.index}-vol"
     },
     var.tags,
   )

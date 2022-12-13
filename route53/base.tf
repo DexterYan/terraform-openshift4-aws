@@ -6,13 +6,13 @@ locals {
   public_endpoints = var.publish_strategy == "External" ? true : false
 
   use_cname = contains(["us-gov-west-1", "us-gov-east-1"], var.region)
-  use_alias = ! local.use_cname
+  use_alias = !local.use_cname
 }
 
 data "aws_route53_zone" "public" {
   #  count = local.public_endpoints ? 1 : 0
   count = 1
-  name = var.base_domain
+  name  = var.base_domain
 }
 
 resource "aws_route53_zone" "int" {
@@ -106,4 +106,18 @@ resource "aws_route53_record" "api_external_internal_zone_cname" {
   ttl     = 10
 
   records = [var.api_internal_lb_dns_name]
+}
+
+resource "aws_route53_record" "api_internal_vpc_alias" {
+  count = local.use_alias ? 1 : 0
+
+  zone_id = aws_route53_zone.int.zone_id
+  name    = var.cluster_domain
+  type    = "A"
+
+  alias {
+    name                   = var.aws_vpc_endpoint_private_ec2_dns_name
+    zone_id                = var.aws_vpc_endpoint_private_ec2_hosted_zone_id
+    evaluate_target_health = false
+  }
 }

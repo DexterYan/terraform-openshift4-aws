@@ -1,17 +1,17 @@
-output master_ign {
-    value = data.local_file.master_ign.content
+output "master_ign" {
+  value = data.local_file.master_ign.content
 }
 
-output bootstrap_ign {
-    value = data.local_file.bootstrap_ign.content
+output "bootstrap_ign" {
+  value = data.local_file.bootstrap_ign.content
 }
 
 output "master_ign_64" {
-    value =  base64encode(data.local_file.master_ign.content)
+  value = base64encode(data.local_file.master_ign.content)
 }
 
 output "worker_ign_64" {
-    value =  base64encode(data.local_file.worker_ign.content)
+  value = base64encode(data.local_file.worker_ign.content)
 }
 
 # output "private_ssh_key" {
@@ -23,5 +23,5 @@ output "worker_ign_64" {
 # }
 
 output "infraID" {
-    value =  data.local_file.infrastructureID.content
+  value = data.local_file.infrastructureID.content
 }
