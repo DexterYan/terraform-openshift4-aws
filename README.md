@@ -1,8 +1,9 @@
 # Automated OpenShift v4 installation on AWS
 
-This project automates the Red Hat OpenShift Container Platform 4.6 (for previous releases - checkout `pre46` branch) installation on Amazon AWS platform. It focuses on the OpenShift User-provided infrastructure installation (UPI) where implementers provide pre-existing infrastructure including VMs, networking, load balancers, DNS configuration etc.
+This project automates the Red Hat OpenShift Container Platform `4.6.28` installation on Amazon AWS platform. It focuses on the OpenShift User-provided infrastructure installation (UPI) where implementers provide pre-existing infrastructure including VMs, networking, load balancers, DNS configuration etc.
 
 * [Terraform Automation](#terraform-automation)
+* [Quick Start](#quick-start)
 * [Infrastructure Architecture](#infrastructure-architecture)
 * [Installation Procedure](#installation-procedure)
 * [Airgapped installation](#airgapped-installation)
@@ -15,12 +16,12 @@ This project uses mainly Terraform as infrastructure management and installation
 
 ### Prerequisites
 
-1. To use Terraform automation, download the Terraform binaries [here](https://www.terraform.io/). The code here supports Terraform 0.15 or later.
+1. To use Terraform automation, download the Terraform binaries [here](https://www.terraform.io/). The code here supports Terraform v1.3.3 or later.
 
    On MacOS, you can acquire it using [homebrew](brew.sh) using this command:
 
    ```bash
-   brew install terraform
+   brew install tfenv
    ```
 
 2. Install git
@@ -30,40 +31,90 @@ This project uses mainly Terraform as infrastructure management and installation
    git --version
    ```
 
-4. Install wget command:
+3. Install wget and command:
 
     - MacOS:
       ```
-      brew install wget
+      brew install wget jq
       ```
     - Linux: (choose the command depending on your distribution)
       ```
-      apt-get install wget
-      yum install wget
-      zypper install wget
+      apt-get install wget jq
+      yum install wget jq
+      zypper install wget jq
       ```
 
-6. Get the Terraform code
-
+4. Set the Terraform Version
+   For Mac M1 Chip
    ```bash
-   git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-aws.git
+   cd terraform-openshift4-aws
+   TFENV_ARCH=amd64 tfenv init  
    ```
 
-7. Prepare the DNS
+   else
+   ```bash
+   cd terraform-openshift4-aws
+   tfenv init  
+   ```
 
-   OpenShift requires a valid public Route53 hosted zone. (Even if you plan to use an airgapped environment)
+5. Prepare the DNS (Only if you want to access your OpenShift out of vpc network)
 
-8. Prepare AWS Account Access
+   OpenShift requires a valid public Route53 hosted zone for public access.
+
+6. Prepare AWS Account Access
 
    Please reference the [Required AWS Infrastructure components](https://docs.openshift.com/container-platform/4.6/installing/installing_aws/installing-aws-account.html) to setup your AWS account before installing OpenShift 4.
 
    We suggest to create an AWS IAM user dedicated for OpenShift installation with permissions documented above.
-   On the bastion host, configure your AWS user credential as environment variables:
+   On Mac, configure your AWS user credential as environment variables:
 
     ```bash
     export AWS_ACCESS_KEY_ID=RKXXXXXXXXXXXXXXX
     export AWS_SECRET_ACCESS_KEY=LXXXXXXXXXXXXXXXXXX/ng
-    export AWS_DEFAULT_REGION=us-east-2
+    export AWS_DEFAULT_REGION=ap-southeast-2
+    ```
+    Or
+    in ~/.aws/credentials
+    ```bash
+    aws_access_key_id = ********
+    aws_secret_access_key = ********
+    ```
+
+    in ~/.aws/config
+    ```bash
+    [default]
+    region = ap-southeast-2
+    ```
+
+## Quick Start
+1. Run terraform, and you can configure terraform.tfvars to match your setting
+    ```bash
+    cp terraform.tfvars.example terraform.tfvars
+    terraform init
+    terraform plan
+    terraform apply
+    ```
+2. Check the terraform output and ssh to the master (during the first 3 minutes, ssh agent may restart due to OpenShift install)
+    ```bash
+    terraform output ssh_master_cmd
+    ssh -i ~/.ssh/id_ed25519.pub core@ec2-13-239-3-*.ap-southeast-2.compute.amazonaws.com
+    ```
+3. Copy the kubeconfig to your master ~/.kube/config
+    ```bash
+    scp ./kubeconfig core@ec2-13-239-3-*.ap-southeast-2.compute.amazonaws.com:/tmp/
+
+    in master
+    mkdir ~/.kube
+    cp /tmp/kubeconfig ~/.kube/config
+    ```
+4. Run oc or kubectl command
+    ```bash
+    oc get node
+    kubectl get node
+    ```
+5. Removing bootstrap node
+    ```bash
+    terraform destroy -target=module.bootstrap.aws_instance.bootstrap
     ```
 
 ## Infrastructure Architecture
