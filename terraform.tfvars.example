@@ -1,10 +1,26 @@
-cluster_name = "ocp4"
-base_domain = "example.com"
+cluster_name          = "replicated-openshift"
+base_domain           = "kots.cloud"
 openshift_pull_secret = "./openshift_pull_secret.json"
-openshift_version = "4.6.28"
+openshift_version     = "4.6.28"
 
 aws_extra_tags = {
   "owner" = "admin"
-  }
-aws_region = "us-east-1"
-aws_publish_strategy = "External"
+}
+aws_region           = "ap-southeast-2"
+aws_publish_strategy = "Internal"
+
+aws_master_instance_type    = "t3.2xlarge"
+aws_master_root_volume_size = 50
+aws_worker_root_volume_size = 50
+aws_worker_instance_type    = "t3.2xlarge"
+
+aws_ignition_bucket = "replicated-openshift-ignition-bucket"
+
+openshift_installer_url = "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.6.28/"
+
+aws_ami = "ami-08a1e52d5b4b9c008"
+aws_azs = [
+  "ap-southeast-2a"
+]
+
+openshift_ssh_key = "~/.ssh/id_ed25519.pub"
