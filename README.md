@@ -86,6 +86,10 @@ This project uses mainly Terraform as infrastructure management and installation
     region = ap-southeast-2
     ```
 
+  7. Create openshift_pull_secret.json
+  
+      The value refers to a file name that contain downloaded pull secret from https://cloud.redhat.com/openshift/pull-secret; the default name is `openshift_pull_secret.json`
+
 ## Quick Start
 1. Run terraform, and you can configure terraform.tfvars to match your setting
     ```bash
