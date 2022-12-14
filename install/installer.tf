@@ -3,10 +3,10 @@ resource "null_resource" "openshift_installer" {
     command = <<EOF
 case $(uname -s) in
   Linux)
-    wget -r -l1 -np -nd ${var.openshift_installer_url}/openshift-install-linux.tar.gz -q -P ${path.root}/installer-files/ -A 'openshift-install-linux-4*.tar.gz'
+    wget -r -l1 -np -nd ${var.openshift_installer_url}/openshift-client-linux.tar.gz -q -P ${path.root}/installer-files/ -A 'openshift-install-linux-4*.tar.gz'
     ;;
   Darwin)
-     cp openshift-install-mac-4.6.28.tar.gz ${path.root}/installer-files/
+    wget -r -l1 -np -nd ${var.openshift_installer_url}/openshift-client-mac.tar.gz -q -P ${path.root}/installer-files/ -A 'openshift-install-mac-4*.tar.gz'
     ;;
   *) exit 1
     ;;
@@ -28,10 +28,10 @@ resource "null_resource" "openshift_client" {
     command = <<EOF
 case $(uname -s) in
   Linux)
-    wget -r -l1 -np -nd ${var.openshift_installer_url}/openshift-client-linux.tar.gz-q -P ${path.root}/installer-files/ -A 'openshift-client-linux-4*.tar.gz'
+    wget -r -l1 -np -nd ${var.openshift_installer_url} -q -P ${path.root}/installer-files/ -A 'openshift-client-linux-4*.tar.gz'
     ;;
   Darwin)
-    cp openshift-client-mac-4.6.28.tar.gz ${path.root}/installer-files/
+    wget -r -l1 -np -nd ${var.openshift_installer_url} -q -P ${path.root}/installer-files/ -A 'openshift-client-mac-4*.tar.gz'
     ;;
   *)
     exit 1
