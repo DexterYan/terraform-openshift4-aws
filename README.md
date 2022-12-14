@@ -90,6 +90,7 @@ This project uses mainly Terraform as infrastructure management and installation
 1. Run terraform, and you can configure terraform.tfvars to match your setting
     ```bash
     cp terraform.tfvars.example terraform.tfvars
+    ./download-installer.sh
     terraform init
     terraform plan
     terraform apply
