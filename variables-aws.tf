@@ -51,7 +51,7 @@ EOF
 variable "aws_master_root_volume_type" {
   type        = string
   description = "The type of volume for the root block device of master nodes."
-  default     = "gp2"
+  default     = "gp3"
 }
 
 variable "aws_master_root_volume_size" {
